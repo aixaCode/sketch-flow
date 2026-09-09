@@ -114,3 +114,13 @@ exist after promotion.
 **Reason:** One rendering path prevents separate SVG and raster implementations from diverging. Embedded data assets make SVG portable, while asynchronous font and image readiness avoids fallback-font captures.
 
 **When changing this:** Verify exported SVG has no external references, compare browser/SVG/PNG rendering, test object-URL cleanup and keep PNG APIs asynchronous.
+
+## 2026-09-10 — Gate releases with deterministic Chromium baselines
+
+**Context:** Unit tests verify geometry and markup but cannot detect browser font, sizing, layering or chart-rendering regressions.
+
+**Decision:** Run Playwright with a pinned Chromium build in CI. Commit snapshots for both approved diagrams at 375, 768 and 1440 pixels and for a gallery exercising every chart.xkcd constructor. Replace `Math.random` with a seeded generator before gallery scripts load because the upstream chart renderer otherwise produces nondeterministic rough geometry.
+
+**Reason:** Browser screenshots cover the visual contract that matters to article production while deterministic inputs keep failures actionable. Moderate pixel tolerance absorbs platform antialiasing without accepting structural layout changes.
+
+**When changing this:** Review baseline images rather than updating them blindly, keep every supported constructor in the gallery, and test changes with the same pinned browser version used by CI.

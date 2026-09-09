@@ -9,21 +9,33 @@
       body { max-width: 1280px; margin: 0 auto; padding: 48px 24px; color: #111; background: #f7f7f5; font-family: system-ui, sans-serif; }
       h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 4rem); font-weight: 500; letter-spacing: -.04em; }
       p { margin: 0 0 32px; color: #555; }
+      h2 { margin: 48px 0 16px; font-size: 1.75rem; }
       .grid { display: grid; gap: 24px; }
+      .chart-grid { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+      .chart-grid figure { height: 432px; overflow: hidden; }
       figure { margin: 0; padding: 20px; border: 1px solid #ddd; background: #fff; }
       figcaption { margin-bottom: 12px; font-weight: 600; }
       .actions { display: flex; gap: 8px; margin: 0 0 16px; }
       button { padding: 8px 12px; border: 1px solid #111; border-radius: 6px; background: #fff; cursor: pointer; }
       svg { display: block; width: 100%; height: auto; }
-      .diagram { aspect-ratio: 8 / 5; }
-      .decision-diagram { aspect-ratio: 168 / 103; }
-      .chart { min-height: 320px; }
+      .chart { min-height: 360px; }
+      .diagram-grid[data-preview="mobile"] figure { max-width: 420px; margin-inline: auto; }
+      @media (max-width: 640px) {
+        body { padding: 28px 12px; }
+        figure { padding: 12px; }
+        .chart-grid { grid-template-columns: 1fr; }
+        .actions { flex-wrap: wrap; }
+      }
     </style>
   </head>
   <body>
     <h1>Sketch Flow layout presets</h1>
     <p>Declarative editorial layouts with shape-aware connectors and the pinned chart.xkcd compatibility entry point.</p>
-    <div class="grid">
+    <div class="actions">
+      <button type="button" data-preview="desktop">Desktop composition</button>
+      <button type="button" data-preview="mobile">Mobile composition</button>
+    </div>
+    <div class="grid diagram-grid" data-preview="desktop">
       <figure>
         <figcaption>Approved pull-request fan-out composition</figcaption>
         <div class="actions">
@@ -36,10 +48,16 @@
         <figcaption>Approved risk decision-tree composition</figcaption>
         <svg class="decision-diagram"></svg>
       </figure>
-      <figure>
-        <figcaption>chart.xkcd 2.0.12</figcaption>
-        <svg class="chart" role="img" aria-label="Example hand-drawn bar chart"></svg>
-      </figure>
+    </div>
+    <h2>chart.xkcd 2.0.12 compatibility gallery</h2>
+    <div class="grid chart-grid">
+      <figure data-chart-name="Bar"><figcaption>Bar</figcaption><svg class="chart" role="img" aria-label="Bar compatibility example"></svg></figure>
+      <figure data-chart-name="StackedBar"><figcaption>StackedBar</figcaption><svg class="chart" role="img" aria-label="Stacked bar compatibility example"></svg></figure>
+      <figure data-chart-name="Pie"><figcaption>Pie</figcaption><svg class="chart" role="img" aria-label="Pie compatibility example"></svg></figure>
+      <figure data-chart-name="Line"><figcaption>Line</figcaption><svg class="chart" role="img" aria-label="Line compatibility example"></svg></figure>
+      <figure data-chart-name="Combined"><figcaption>Combined</figcaption><svg class="chart" role="img" aria-label="Combined compatibility example"></svg></figure>
+      <figure data-chart-name="XY"><figcaption>XY</figcaption><svg class="chart" role="img" aria-label="XY compatibility example"></svg></figure>
+      <figure data-chart-name="Radar"><figcaption>Radar</figcaption><svg class="chart" role="img" aria-label="Radar compatibility example"></svg></figure>
     </div>
     <script type="module" src="./main.js"></script>
   </body>
