@@ -17,6 +17,7 @@ The repository is independent from `chart.xkcd`. The `./charts` compatibility en
 | `src/diagram/Diagram.js` | DOM orchestration and pure inner-SVG rendering API. |
 | `src/diagram/schema.js` | Diagram defaults, validation and explicit mobile-config selection. |
 | `src/diagram/layout/` | Manual, linear, fan-out and decision-tree positioning. |
+| `src/diagram/export/` | Standalone SVG serialization, PNG conversion and browser downloads. |
 | `src/diagram/geometry/` | Shape-boundary intersections and connector routes. |
 | `src/diagram/render/` | Text wrapping and SVG composition. |
 | `src/primitives/` | Theme, embedded font, roughness filter and SVG shape primitives. |
@@ -47,6 +48,10 @@ Automatic layout is dispatched by `src/diagram/layout/index.js`. Linear layouts 
 
 A top-level `mobile` object is a full alternate diagram plus a positive `breakpoint`. `Diagram.render()` selects it from an explicit `viewportWidth` or a measurable `svg.clientWidth`; `renderDiagram()` accepts `viewportWidth` as an option. Selection does not mutate or infer a different graph. Callers re-render after a container resize.
 
+Phase 4 export keeps SVG canonical. `serializeDiagram()` and `Diagram.toSVG()` wrap the same renderer output in a complete SVG document with namespace, fixed intrinsic dimensions, viewBox, accessibility references, embedded font and deterministic filter. Paper, transparent and caller-selected CSS backgrounds are supported.
+
+`Diagram.toPNG()` serializes that SVG, waits for `document.fonts.ready` when available, decodes it as an object-URL image, and draws it to a scaled canvas before resolving a PNG `Blob`. Object URLs are always revoked. PNG conversion and download conveniences are browser-only; SVG serialization remains DOM-free.
+
 Edges use automatic shape intersections unless the configuration selects a cardinal `fromAnchor` or `toAnchor`. Explicit anchors allow several fan-out edges to share one source junction. The destination endpoint is pulled back from the shape border before the open arrowhead is rendered, keeping the arrow visible above node layers.
 
 ## External integrations
@@ -69,6 +74,5 @@ There is no deployment target. npm publishing is disabled and `package.json` is 
 
 ## Known gaps
 
-- SVG serialization and PNG export are not implemented.
 - Browser and image-export test infrastructure is not selected.
 - The final public npm package name and publishing ownership require explicit approval.

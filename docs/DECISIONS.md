@@ -104,3 +104,13 @@ exist after promotion.
 **Reason:** Caller-owned mobile semantics are reviewable and deterministic. Avoiding implicit graph rewrites and resize observers keeps Phase 3 behavior small and lifecycle-free.
 
 **When changing this:** Test desktop and mobile configurations independently, preserve pure width-based selection, and introduce automatic resize lifecycle only with a documented teardown API.
+
+## 2026-09-09 — Derive every portable format from canonical SVG
+
+**Context:** Article tooling needs editable SVG and high-resolution PNG without visual drift between browser rendering and downloaded assets.
+
+**Decision:** Serialize a complete SVG document from the same validated configuration and renderer used on screen. Embed the attributed font by default, retain accessibility metadata and deterministic filter IDs, and derive PNG by decoding that SVG into a scaled browser canvas after font readiness. Support paper and transparent backgrounds explicitly.
+
+**Reason:** One rendering path prevents separate SVG and raster implementations from diverging. Embedded data assets make SVG portable, while asynchronous font and image readiness avoids fallback-font captures.
+
+**When changing this:** Verify exported SVG has no external references, compare browser/SVG/PNG rendering, test object-URL cleanup and keep PNG APIs asynchronous.

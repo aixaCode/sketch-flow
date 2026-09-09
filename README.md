@@ -4,7 +4,7 @@ Sketch Flow is a JavaScript library for hand-drawn SVG diagrams with flexible ed
 
 The project is independent from [chart.xkcd](https://github.com/timqian/chart.xkcd). Sketch Flow owns its diagram API and release lifecycle while providing an isolated compatibility entry point for the complete public API of the exact, tested `chart.xkcd` version `2.0.12`. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-> **Status:** Pre-alpha. Phase 3 provides validated manual and automatic layouts. SVG/PNG export arrives in a later phase.
+> **Status:** Pre-alpha. Phase 4 provides validated layouts plus portable SVG and high-resolution PNG export.
 
 ## Automatic layouts
 
@@ -59,6 +59,23 @@ diagram.render({ viewportWidth: 480 }); // Explicit and deterministic.
 ```
 
 Call `render()` again after the container changes size. The pure API accepts the same choice through `renderDiagram(config, { id, viewportWidth })`.
+
+## Portable export
+
+Every diagram can produce a complete SVG document containing its font, filter, theme, accessibility title and description. PNG export renders that same document after browser fonts are ready and returns a `Promise<Blob>`.
+
+```js
+const svg = diagram.toSVG();
+const transparentSvg = diagram.toSVG({ backgroundColor: 'transparent' });
+const png = await diagram.toPNG({ scale: 2, backgroundColor: 'paper' });
+
+diagram.downloadSVG('review-flow.svg');
+await diagram.downloadPNG('review-flow.png', { scale: 2 });
+```
+
+`backgroundColor` accepts `paper` (the theme background), `transparent`, `null`, or a CSS colour. `toSVG({ embedFont: false })` is available when a consumer deliberately manages fonts externally. Responsive exports accept `viewportWidth` and use the same explicit mobile composition as browser rendering.
+
+Functional integrations can use `serializeDiagram(config, options)` and `svgToPng(svg, { width, height, scale })`. PNG conversion and both download helpers require browser Canvas, Image, Blob and object URL APIs; SVG serialization itself is DOM-free.
 
 ## Manual diagrams
 
