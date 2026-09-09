@@ -13,6 +13,7 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 - `src/index.js` — public diagram and visual-primitives entry point.
 - `src/charts.js` — isolated chart.xkcd compatibility entry point.
 - `src/diagram/layout/` — deterministic manual, linear, fan-out and decision-tree layout engines.
+- `src/diagram/export/` — standalone SVG serialization, browser PNG conversion and downloads.
 - `src/diagram/` — config validation, responsive selection, geometry, text and diagram rendering.
 - `src/primitives/` — theme, font, filter and SVG shape primitives.
 - `examples/` — coordinate-free preset examples plus compatible charts.
@@ -43,6 +44,7 @@ Do not claim a check passed unless it was run successfully. If a command require
 - Keep the package independent from `aixaCode/chart.xkcd`; depend only on the exact tested public npm version through the isolated `./charts` compatibility entry point.
 - Preserve attribution and applicable licence notices for any implementation or asset adapted from upstream projects.
 - Render diagrams as pure SVG. Do not introduce HTML `foreignObject` without recording and testing a justified exception.
+- Keep SVG as the canonical export. PNG must be derived from the same serialized SVG after font readiness.
 - Keep layout, geometry, rendering and export concerns in separate modules.
 - Keep output deterministic when a seed is provided so visual regression tests remain meaningful.
 - Do not enable npm publishing or remove `private: true` without explicit release authorization.

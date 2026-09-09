@@ -93,14 +93,18 @@ function renderEdge(edge, nodeById, config, filterId) {
   return `<g data-edge="${escapeXml(edge.from)}:${escapeXml(edge.to)}" filter="url(#${filterId})">${path}${arrowhead}</g>`;
 }
 
-export function renderDiagramMarkup(config, diagramId) {
+export function renderDiagramMarkup(config, diagramId, {
+  embedFont = true,
+  backgroundColor = config.theme.backgroundColor,
+} = {}) {
   const { nodes, edges: laidOutEdges } = layoutDiagram(config);
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
   const filterId = `${diagramId}-rough`;
   const titleId = `${diagramId}-title`;
   const descriptionId = `${diagramId}-description`;
   const fontStyleId = `${diagramId}-font`;
-  const definitions = `<defs>${renderFontDefinition({ id: fontStyleId })}${renderRoughFilter({
+  const fontDefinition = embedFont ? renderFontDefinition({ id: fontStyleId }) : '';
+  const definitions = `<defs>${fontDefinition}${renderRoughFilter({
     id: filterId,
     roughness: config.theme.roughness,
     seed: config.theme.seed,
@@ -109,7 +113,9 @@ export function renderDiagramMarkup(config, diagramId) {
   const accessibleDescription = config.description
     ? `<desc id="${descriptionId}">${escapeXml(config.description)}</desc>`
     : '';
-  const background = `<rect width="${config.options.width}" height="${config.options.height}" fill="${escapeXml(config.theme.backgroundColor)}"/>`;
+  const background = backgroundColor === null
+    ? ''
+    : `<rect width="${config.options.width}" height="${config.options.height}" fill="${escapeXml(backgroundColor)}"/>`;
   const visualTitle = config.title && config.options.showTitle
     ? renderTextLines({
       lines: [config.title],
