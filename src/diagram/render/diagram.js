@@ -1,6 +1,6 @@
 import { edgeEndpoints } from '../geometry/bounds.js';
 import { routePath } from '../geometry/paths.js';
-import { layoutManual } from '../layout/manual.js';
+import { layoutDiagram } from '../layout/index.js';
 import { renderFontDefinition } from '../../primitives/font.js';
 import { renderRoughFilter } from '../../primitives/filter.js';
 import { renderArrowhead, renderBox, renderDiamond } from '../../primitives/shapes.js';
@@ -94,7 +94,7 @@ function renderEdge(edge, nodeById, config, filterId) {
 }
 
 export function renderDiagramMarkup(config, diagramId) {
-  const nodes = layoutManual(config.nodes);
+  const { nodes, edges: laidOutEdges } = layoutDiagram(config);
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
   const filterId = `${diagramId}-rough`;
   const titleId = `${diagramId}-title`;
@@ -124,7 +124,7 @@ export function renderDiagramMarkup(config, diagramId) {
       className: 'sketch-flow-title',
     })
     : '';
-  const edges = config.edges.map((edge) => renderEdge(edge, nodeById, config, filterId)).join('');
+  const edges = laidOutEdges.map((edge) => renderEdge(edge, nodeById, config, filterId)).join('');
   const renderedNodes = nodes.map((node) => renderNode(node, config, filterId)).join('');
   return `${definitions}${accessibleTitle}${accessibleDescription}${background}${visualTitle}<g class="sketch-flow-edges">${edges}</g><g class="sketch-flow-nodes">${renderedNodes}</g>`;
 }

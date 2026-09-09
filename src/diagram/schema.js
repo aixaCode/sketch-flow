@@ -3,6 +3,8 @@ import { createTheme } from '../primitives/theme.js';
 const SHAPES = new Set(['box', 'diamond']);
 const ROUTES = new Set(['curve', 'straight', 'orthogonal']);
 const ANCHORS = new Set(['auto', 'top', 'right', 'bottom', 'left']);
+const LAYOUTS = new Set(['manual', 'linear', 'fan-out', 'decision-tree']);
+const DIRECTIONS = new Set(['left-to-right', 'top-to-bottom']);
 const THEME_KEYS = [
   'backgroundColor',
   'strokeColor',
@@ -92,7 +94,32 @@ function normalizeOptions(options = {}) {
   });
 }
 
-function normalizeNode(node, index, options) {
+function normalizeLayout(layout = { type: 'manual' }) {
+  object(layout, 'layout');
+  const type = layout.type ?? 'manual';
+  if (!LAYOUTS.has(type)) {
+    throw new TypeError('layout.type must be "manual", "linear", "fan-out" or "decision-tree"');
+  }
+  const direction = layout.direction ?? 'left-to-right';
+  if (!DIRECTIONS.has(direction)) {
+    throw new TypeError('layout.direction must be "left-to-right" or "top-to-bottom"');
+  }
+  if (type === 'decision-tree' && direction !== 'left-to-right') {
+    throw new TypeError('decision-tree currently supports only left-to-right direction');
+  }
+
+  return Object.freeze({
+    ...layout,
+    type,
+    direction,
+    columnGap: positive(layout.columnGap ?? 140, 'layout.columnGap'),
+    rowGap: positive(layout.rowGap ?? 70, 'layout.rowGap'),
+    source: string(layout.source, 'layout.source', { optional: true }),
+    decision: string(layout.decision, 'layout.decision', { optional: true }),
+  });
+}
+
+function normalizeNode(node, index, options, layout) {
   object(node, `nodes[${index}]`);
   const id = string(node.id, `nodes[${index}].id`);
   const shape = node.shape ?? 'box';
@@ -110,6 +137,14 @@ function normalizeNode(node, index, options) {
   if (!['start', 'middle', 'end'].includes(descriptionAnchor)) {
     throw new TypeError(`nodes[${index}].descriptionAnchor must be "start", "middle" or "end"`);
   }
+  const requiresCoordinates = layout.type === 'manual';
+  const x = node.x === undefined && !requiresCoordinates
+    ? undefined
+    : finite(node.x, `nodes[${index}].x`);
+  const y = node.y === undefined && !requiresCoordinates
+    ? undefined
+    : finite(node.y, `nodes[${index}].y`);
+  const order = node.order === undefined ? index : finite(node.order, `nodes[${index}].order`);
 
   return Object.freeze({
     ...node,
@@ -117,8 +152,9 @@ function normalizeNode(node, index, options) {
     label: string(node.label, `nodes[${index}].label`),
     description: string(node.description, `nodes[${index}].description`, { optional: true }),
     shape,
-    x: finite(node.x, `nodes[${index}].x`),
-    y: finite(node.y, `nodes[${index}].y`),
+    x,
+    y,
+    order,
     width: positive(node.width ?? options.nodeWidth, `nodes[${index}].width`),
     height: positive(node.height ?? options.nodeHeight, `nodes[${index}].height`),
     fontSize: positive(node.fontSize ?? options.fontSize, `nodes[${index}].fontSize`),
@@ -165,13 +201,9 @@ function normalizeEdge(edge, index, nodeIds) {
   });
 }
 
-export function validateDiagramConfig(config) {
+function validateSingleDiagram(config) {
   object(config, 'diagram config');
-  const layout = config.layout ?? { type: 'manual' };
-  object(layout, 'layout');
-  if ((layout.type ?? 'manual') !== 'manual') {
-    throw new TypeError('Phase 2 supports only layout.type "manual"');
-  }
+  const layout = normalizeLayout(config.layout);
   if (!Array.isArray(config.nodes) || config.nodes.length === 0) {
     throw new TypeError('nodes must be a non-empty array');
   }
@@ -180,7 +212,7 @@ export function validateDiagramConfig(config) {
   }
 
   const options = normalizeOptions(config.options);
-  const nodes = config.nodes.map((node, index) => normalizeNode(node, index, options));
+  const nodes = config.nodes.map((node, index) => normalizeNode(node, index, options, layout));
   const nodeIds = new Set();
   for (const node of nodes) {
     if (nodeIds.has(node.id)) throw new TypeError(`duplicate node id "${node.id}"`);
@@ -203,11 +235,41 @@ export function validateDiagramConfig(config) {
     ...config,
     title,
     description,
-    layout: Object.freeze({ ...layout, type: 'manual' }),
+    layout,
     nodes: Object.freeze(nodes),
     edges: Object.freeze(edges),
     options,
     theme: createTheme(themeOverrides),
     ariaLabel,
   });
+}
+
+export function validateDiagramConfig(config) {
+  const desktop = validateSingleDiagram(config);
+  if (config.mobile === undefined) return desktop;
+  object(config.mobile, 'mobile');
+  if (config.mobile.mobile !== undefined) {
+    throw new TypeError('mobile configuration cannot contain another mobile configuration');
+  }
+  const { breakpoint: rawBreakpoint, ...mobileConfig } = config.mobile;
+  const breakpoint = positive(rawBreakpoint, 'mobile.breakpoint');
+  const mobile = validateSingleDiagram(mobileConfig);
+  return Object.freeze({
+    ...desktop,
+    mobile: Object.freeze({ breakpoint, config: mobile }),
+  });
+}
+
+export function resolveDiagramConfig(config, viewportWidth) {
+  if (viewportWidth !== undefined) {
+    positive(viewportWidth, 'viewportWidth');
+  }
+  if (
+    config.mobile
+    && Number.isFinite(viewportWidth)
+    && viewportWidth <= config.mobile.breakpoint
+  ) {
+    return config.mobile.config;
+  }
+  return config;
 }

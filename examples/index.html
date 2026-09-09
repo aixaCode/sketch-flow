@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sketch Flow manual diagrams</title>
+    <title>Sketch Flow layout presets</title>
     <style>
       * { box-sizing: border-box; }
       body { max-width: 1280px; margin: 0 auto; padding: 48px 24px; color: #111; background: #f7f7f5; font-family: system-ui, sans-serif; }
@@ -14,16 +14,21 @@
       figcaption { margin-bottom: 12px; font-weight: 600; }
       svg { display: block; width: 100%; height: auto; }
       .diagram { aspect-ratio: 8 / 5; }
+      .decision-diagram { aspect-ratio: 168 / 103; }
       .chart { min-height: 320px; }
     </style>
   </head>
   <body>
-    <h1>Sketch Flow manual diagrams</h1>
-    <p>Validated editorial positioning with shape-aware connectors and the pinned chart.xkcd compatibility entry point.</p>
+    <h1>Sketch Flow layout presets</h1>
+    <p>Declarative editorial layouts with shape-aware connectors and the pinned chart.xkcd compatibility entry point.</p>
     <div class="grid">
       <figure>
         <figcaption>Approved pull-request fan-out composition</figcaption>
         <svg class="diagram"></svg>
+      </figure>
+      <figure>
+        <figcaption>Approved risk decision-tree composition</figcaption>
+        <svg class="decision-diagram"></svg>
       </figure>
       <figure>
         <figcaption>chart.xkcd 2.0.12</figcaption>

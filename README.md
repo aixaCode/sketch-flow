@@ -4,7 +4,61 @@ Sketch Flow is a JavaScript library for hand-drawn SVG diagrams with flexible ed
 
 The project is independent from [chart.xkcd](https://github.com/timqian/chart.xkcd). Sketch Flow owns its diagram API and release lifecycle while providing an isolated compatibility entry point for the complete public API of the exact, tested `chart.xkcd` version `2.0.12`. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-> **Status:** Pre-alpha. Phase 2 provides validated manual diagrams; automatic layout presets and SVG/PNG export arrive in later phases.
+> **Status:** Pre-alpha. Phase 3 provides validated manual and automatic layouts. SVG/PNG export arrives in a later phase.
+
+## Automatic layouts
+
+Choose `linear`, `fan-out`, or `decision-tree` to let Sketch Flow calculate coordinates while you retain control of node order, size, accent and edge routes. Presets are deterministic and reject configurations that do not fit the requested viewBox.
+
+```js
+import { Diagram } from '@aixacode/sketch-flow';
+
+new Diagram(document.querySelector('svg'), {
+  title: 'One review gate has been doing several jobs',
+  layout: { type: 'fan-out', source: 'pull-request' },
+  nodes: [
+    { id: 'pull-request', label: 'PULL REQUEST', width: 430, height: 170 },
+    { id: 'checks', label: 'MECHANICAL CHECKS', order: 1 },
+    { id: 'judgment', label: 'SYSTEM JUDGMENT', order: 2, accent: true },
+    { id: 'runtime', label: 'RUNTIME CONFIDENCE', order: 3 },
+  ],
+  edges: [
+    { from: 'pull-request', to: 'checks' },
+    { from: 'pull-request', to: 'judgment', route: 'orthogonal', accent: true },
+    { from: 'pull-request', to: 'runtime' },
+  ],
+  options: { width: 1600, height: 900 },
+});
+```
+
+`linear` supports `direction: 'left-to-right'` and `direction: 'top-to-bottom'`. `fan-out` supports both directions and uses `layout.source` (or an unambiguous source inferred from the edges). `decision-tree` uses `layout.decision` (or an unambiguous branching diamond), orders branches by the first node's `order`, and currently flows left-to-right. Use `columnGap` and `rowGap` on any preset.
+
+Preset anchors are only defaults. An edge can still specify `fromAnchor`, `toAnchor`, and `route` to override its connector without supplying raw SVG paths.
+
+### Explicit mobile composition
+
+Responsive diagrams use a complete caller-authored alternative. This keeps semantic changes visible in configuration instead of silently rearranging the desktop graph.
+
+```js
+const config = {
+  layout: { type: 'linear' },
+  nodes: desktopNodes,
+  edges: desktopEdges,
+  mobile: {
+    breakpoint: 640,
+    layout: { type: 'linear', direction: 'top-to-bottom' },
+    nodes: mobileNodes,
+    edges: mobileEdges,
+    options: { width: 480, height: 900 },
+  },
+};
+
+const diagram = new Diagram(svg, config);
+diagram.render(); // Reads svg.clientWidth when it is available.
+diagram.render({ viewportWidth: 480 }); // Explicit and deterministic.
+```
+
+Call `render()` again after the container changes size. The pure API accepts the same choice through `renderDiagram(config, { id, viewportWidth })`.
 
 ## Manual diagrams
 
