@@ -12,9 +12,10 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 
 - `src/index.js` — public diagram and visual-primitives entry point.
 - `src/charts.js` — isolated chart.xkcd compatibility entry point.
-- `src/diagram/` — config validation, manual layout, geometry, text and diagram rendering.
+- `src/diagram/layout/` — deterministic manual, linear, fan-out and decision-tree layout engines.
+- `src/diagram/` — config validation, responsive selection, geometry, text and diagram rendering.
 - `src/primitives/` — theme, font, filter and SVG shape primitives.
-- `examples/` — browser example for primitives and compatible charts.
+- `examples/` — coordinate-free preset examples plus compatible charts.
 - `licenses/` — retained upstream licence notices.
 - `test/` — Node test suite.
 - `docs/AI_CONTEXT.md` — architecture and delivery context.

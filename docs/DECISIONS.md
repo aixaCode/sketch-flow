@@ -84,3 +84,23 @@ exist after promotion.
 **Reason:** Automatic intersections provide safe defaults, while explicit anchors preserve the visual meaning and cleanliness of authored layouts. Keeping route intent declarative leaves geometry under library control.
 
 **When changing this:** Retain the manual mode when adding presets, test all shape/route/anchor combinations, and visually verify shared junctions and unobscured arrowheads.
+
+## 2026-09-09 — Keep automatic layouts deterministic and structure-aware
+
+**Context:** The approved fan-out and risk-routing compositions should be authored without hard-coded coordinates or SVG paths, while retaining editorial order and connector control.
+
+**Decision:** Provide linear, fan-out and decision-tree presets that validate their expected graph structure, respect per-node sizes and ordering, and supply cardinal anchors only when an edge leaves them automatic. Keep manual layout available for exceptional compositions, and fail clearly when a preset cannot fit its configured viewBox.
+
+**Reason:** Small, opinionated algorithms reproduce the recurring article layouts predictably without adopting a general graph engine or hiding layout mistakes through clipping and overlap.
+
+**When changing this:** Preserve deterministic output, topology and fit errors, explicit route/anchor overrides, coordinate-free approved examples and manual-layout compatibility.
+
+## 2026-09-09 — Make mobile composition explicit
+
+**Context:** A narrow article layout may need different wording, graph structure or direction—not merely scaled desktop coordinates.
+
+**Decision:** Accept a complete alternate diagram under `mobile`, selected by a positive `breakpoint`. Use an explicit render width when supplied, otherwise a measurable SVG client width, and require callers to render again after resize.
+
+**Reason:** Caller-owned mobile semantics are reviewable and deterministic. Avoiding implicit graph rewrites and resize observers keeps Phase 3 behavior small and lifecycle-free.
+
+**When changing this:** Test desktop and mobile configurations independently, preserve pure width-based selection, and introduce automatic resize lifecycle only with a documented teardown API.
