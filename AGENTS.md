@@ -10,8 +10,9 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 
 ## Repository map
 
-- `src/index.js` — public visual-primitives entry point.
+- `src/index.js` — public diagram and visual-primitives entry point.
 - `src/charts.js` — isolated chart.xkcd compatibility entry point.
+- `src/diagram/` — config validation, manual layout, geometry, text and diagram rendering.
 - `src/primitives/` — theme, font, filter and SVG shape primitives.
 - `examples/` — browser example for primitives and compatible charts.
 - `licenses/` — retained upstream licence notices.
