@@ -22,6 +22,8 @@ The repository is independent from `chart.xkcd`. The `./charts` compatibility en
 | `src/diagram/render/` | Text wrapping and SVG composition. |
 | `src/primitives/` | Theme, embedded font, roughness filter and SVG shape primitives. |
 | `examples/` | Browser example for visual and compatibility checks. |
+| `test/browser/` | Chromium integration tests and cross-viewport visual baselines. |
+| `playwright.config.js` | Browser-test server, snapshot location and comparison tolerance. |
 | `licenses/chart.xkcd-LICENSE` | Retained upstream MIT licence notice. |
 | `test/` | Node test suite. |
 | `vite.config.js` | ES-module library build. |
@@ -31,7 +33,7 @@ The repository is independent from `chart.xkcd`. The `./charts` compatibility en
 
 ## Runtime and data flow
 
-Phase 3 implements the diagram runtime through deterministic SVG rendering:
+The diagram runtime uses deterministic SVG rendering:
 
 ```text
 diagram configuration
@@ -62,9 +64,10 @@ There are no runtime services, credentials or data stores. `chart.xkcd` `2.0.12`
 
 - `npm run lint` checks JavaScript sources, tests and configuration with ESLint.
 - `npm test` runs the Node test suite.
+- `npm run test:browser` runs Playwright Chromium integration and screenshot regression tests.
 - `npm run build` produces the ES-module package under `dist/` with Vite.
 
-The example page provides browser rendering checks for the approved coordinate-free pull-request fan-out and risk decision-tree compositions. Automated browser and visual-regression coverage are not implemented yet.
+The example page is an interactive gallery for desktop/mobile diagram composition, SVG/PNG downloads and all seven chart.xkcd constructors. Playwright fixes `Math.random` before page scripts run so upstream rough chart geometry remains stable. Committed snapshots cover both approved diagrams at 375, 768 and 1440 pixels plus the complete compatibility gallery. CI installs the pinned Chromium build and enforces those baselines.
 
 ## Delivery and operations
 
@@ -74,5 +77,4 @@ There is no deployment target. npm publishing is disabled and `package.json` is 
 
 ## Known gaps
 
-- Browser and image-export test infrastructure is not selected.
 - The final public npm package name and publishing ownership require explicit approval.

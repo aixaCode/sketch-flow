@@ -16,6 +16,26 @@ export const reviewGateDiagram = {
     { from: 'pull-request', to: 'knowledge' },
   ],
   options: { width: 1600, height: 1040, seed: 42, roughness: 4.5, arrowGap: 14 },
+  mobile: {
+    breakpoint: 640,
+    title: 'One review gate, several jobs',
+    description: 'A compact pull-request fan-out composed explicitly for narrow article layouts.',
+    layout: { type: 'fan-out', source: 'pull-request', columnGap: 40, rowGap: 30 },
+    nodes: [
+      { id: 'pull-request', label: 'PULL\nREQUEST', width: 150, height: 100, fontSize: 24 },
+      { id: 'mechanical', label: 'MECHANICAL CHECKS', description: 'Rules, tests, consistency', width: 420, height: 85, fontSize: 23, descriptionFontSize: 18, order: 1 },
+      { id: 'judgment', label: 'SYSTEM JUDGMENT', description: 'Architecture, intent, blast radius', width: 420, height: 85, fontSize: 23, descriptionFontSize: 18, order: 2, accent: true },
+      { id: 'runtime', label: 'RUNTIME CONFIDENCE', description: 'QA, performance, real behaviour', width: 420, height: 85, fontSize: 23, descriptionFontSize: 18, order: 3 },
+      { id: 'knowledge', label: 'SHARED KNOWLEDGE', description: 'Who else can operate it?', width: 420, height: 85, fontSize: 23, descriptionFontSize: 18, order: 4 },
+    ],
+    edges: [
+      { from: 'pull-request', to: 'mechanical' },
+      { from: 'pull-request', to: 'judgment', accent: true },
+      { from: 'pull-request', to: 'runtime' },
+      { from: 'pull-request', to: 'knowledge' },
+    ],
+    options: { width: 650, height: 880, padding: 20, titleFontSize: 28, seed: 42, roughness: 4.5, arrowGap: 10 },
+  },
 };
 
 export const riskDecisionDiagram = {
@@ -46,4 +66,22 @@ export const riskDecisionDiagram = {
     { from: 'high-judgment', to: 'high-rollout', route: 'straight' },
   ],
   options: { width: 1680, height: 1030, seed: 21, roughness: 4.5, arrowGap: 12 },
+  mobile: {
+    breakpoint: 640,
+    title: 'Match review to risk',
+    description: 'The same three risk paths summarized explicitly for a narrow article layout.',
+    layout: { type: 'fan-out', source: 'risk', columnGap: 35, rowGap: 35 },
+    nodes: [
+      { id: 'risk', label: 'CHANGE:\nWHAT CAN\nGO WRONG?', shape: 'diamond', width: 180, height: 210, fontSize: 23, accent: true },
+      { id: 'low', label: 'LOW RISK\nReversible + easy to detect\nChecks + AI + observability', width: 400, height: 125, fontSize: 21, order: 1, accent: true },
+      { id: 'medium', label: 'MEDIUM RISK\nHuman reviews behaviour, tests\nand system fit', width: 400, height: 125, fontSize: 21, order: 2 },
+      { id: 'high', label: 'HIGH RISK / ONE-WAY DOOR\nHuman judgment before implementation\nFocused review + rollout plan', width: 400, height: 140, fontSize: 20, order: 3 },
+    ],
+    edges: [
+      { from: 'risk', to: 'low' },
+      { from: 'risk', to: 'medium', route: 'straight' },
+      { from: 'risk', to: 'high' },
+    ],
+    options: { width: 650, height: 720, padding: 15, titleFontSize: 28, seed: 21, roughness: 4.5, arrowGap: 8 },
+  },
 };

@@ -4,7 +4,9 @@ Sketch Flow is a JavaScript library for hand-drawn SVG diagrams with flexible ed
 
 The project is independent from [chart.xkcd](https://github.com/timqian/chart.xkcd). Sketch Flow owns its diagram API and release lifecycle while providing an isolated compatibility entry point for the complete public API of the exact, tested `chart.xkcd` version `2.0.12`. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-> **Status:** Pre-alpha. Phase 4 provides validated layouts plus portable SVG and high-resolution PNG export.
+> **Status:** Pre-alpha release candidate. Layouts, portable export, browser visual regression and the pinned chart compatibility gallery are implemented. npm publishing remains deliberately disabled.
+
+See the [API reference](docs/API.md) for the complete configuration, lifecycle and export surface.
 
 ## Automatic layouts
 
@@ -147,6 +149,8 @@ new charts.Bar(svgElement, chartConfiguration);
 
 The exact upstream dependency is pinned so updates do not silently alter this API. A deliberate dependency upgrade still requires compatibility testing.
 
+The interactive example renders `Bar`, `StackedBar`, `Pie`, `Line`, `Combined`, `XY`, and `Radar` together with the approved diagrams. Its desktop/mobile composition controls and SVG/PNG download buttons exercise the public browser API.
+
 ## Run
 
 Requires Node.js 22 or newer.
@@ -155,6 +159,7 @@ Requires Node.js 22 or newer.
 npm ci
 npm run lint
 npm test
+npm run test:browser
 npm run build
 ```
 
@@ -162,6 +167,12 @@ Run the browser example with:
 
 ```bash
 npm run dev
+```
+
+The first browser-test run needs the pinned Chromium build:
+
+```bash
+npx playwright install chromium
 ```
 
 ## Deploy
