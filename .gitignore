@@ -7,6 +7,8 @@
 node_modules/
 dist/
 coverage/
+.playwright-output/
+test-results/
 
 # Logs & OS junk
 logs/

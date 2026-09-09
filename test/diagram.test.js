@@ -261,3 +261,20 @@ test('Diagram assigns collision-free SVG definitions and supports updates', () =
   first.update(baseConfig({ options: { width: 800, height: 300 } }));
   assert.equal(firstSvg.attributes.viewBox, '0 0 800 300');
 });
+
+test('Diagram destroy removes owned content and prevents later use', () => {
+  const svg = {
+    attributes: {},
+    innerHTML: '',
+    setAttribute(name, value) { this.attributes[name] = value; },
+    removeAttribute(name) { delete this.attributes[name]; },
+  };
+  const diagram = new Diagram(svg, baseConfig());
+  assert.notEqual(svg.innerHTML, '');
+  diagram.destroy();
+  assert.equal(svg.innerHTML, '');
+  assert.deepEqual(svg.attributes, {});
+  assert.equal(diagram.destroy(), diagram);
+  assert.throws(() => diagram.render(), /has been destroyed/);
+  assert.throws(() => diagram.toSVG(), /has been destroyed/);
+});

@@ -24,12 +24,14 @@ export class Diagram {
   constructor(svg, config) {
     assertSvgElement(svg);
     this.svg = svg;
+    this.destroyed = false;
     this.id = `sketch-flow-${nextDiagramId}`;
     nextDiagramId += 1;
     this.update(config);
   }
 
   render({ viewportWidth } = {}) {
+    this.#assertActive();
     const measuredWidth = viewportWidth ?? (
       Number.isFinite(this.svg.clientWidth) && this.svg.clientWidth > 0
         ? this.svg.clientWidth
@@ -47,11 +49,13 @@ export class Diagram {
   }
 
   update(config) {
+    this.#assertActive();
     this.config = validateDiagramConfig(config);
     return this.render();
   }
 
   toSVG(options = {}) {
+    this.#assertActive();
     const viewportWidth = this.#viewportWidth(options.viewportWidth);
     return serializeResolvedDiagram(resolveDiagramConfig(this.config, viewportWidth), {
       id: `${this.id}-export`,
@@ -61,6 +65,7 @@ export class Diagram {
   }
 
   async toPNG({ scale = 2, backgroundColor = 'paper', viewportWidth } = {}) {
+    this.#assertActive();
     const width = this.#viewportWidth(viewportWidth);
     const config = resolveDiagramConfig(this.config, width);
     const svg = this.toSVG({ viewportWidth: width, backgroundColor });
@@ -72,15 +77,33 @@ export class Diagram {
   }
 
   downloadSVG(filename = 'diagram.svg', options = {}) {
+    this.#assertActive();
     const svg = this.toSVG(options);
     downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), filename, '.svg');
     return this;
   }
 
   async downloadPNG(filename = 'diagram.png', options = {}) {
+    this.#assertActive();
     const png = await this.toPNG(options);
     downloadBlob(png, filename, '.png');
     return this;
+  }
+
+  destroy() {
+    if (this.destroyed) return this;
+    this.svg.innerHTML = '';
+    if (typeof this.svg.removeAttribute === 'function') {
+      for (const attribute of ['viewBox', 'width', 'role', 'aria-labelledby']) {
+        this.svg.removeAttribute(attribute);
+      }
+    }
+    this.destroyed = true;
+    return this;
+  }
+
+  #assertActive() {
+    if (this.destroyed) throw new Error('Diagram has been destroyed');
   }
 
   #viewportWidth(viewportWidth) {

@@ -17,6 +17,8 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 - `src/diagram/` — config validation, responsive selection, geometry, text and diagram rendering.
 - `src/primitives/` — theme, font, filter and SVG shape primitives.
 - `examples/` — coordinate-free preset examples plus compatible charts.
+- `test/browser/` — Chromium integration tests and committed visual baselines.
+- `playwright.config.js` — deterministic browser-test server and screenshot policy.
 - `licenses/` — retained upstream licence notices.
 - `test/` — Node test suite.
 - `docs/AI_CONTEXT.md` — architecture and delivery context.
@@ -30,6 +32,7 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 install: npm ci
 lint:    npm run lint
 test:    npm test
+browser: npm run test:browser
 build:   npm run build
 ```
 
