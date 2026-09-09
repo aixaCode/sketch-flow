@@ -74,3 +74,13 @@ exist after promotion.
 **Reason:** A common primitive layer keeps diagrams and charts visually coherent. Open path arrowheads match the reference layout more closely than filled SVG markers and remain controllable as ordinary geometry.
 
 **When changing this:** Preserve deterministic seeded output and attribution, verify SVG portability, and visually compare strokes, font and arrowheads against the example.
+
+## 2026-09-09 — Keep manual layout first-class
+
+**Context:** Editorial diagrams need to reproduce approved compositions exactly, including a shared fan-out junction and consistent entry sides on destination nodes.
+
+**Decision:** Require explicit node coordinates for the Phase 2 manual layout. Calculate connector endpoints from box or diamond boundaries by default, and allow cardinal `fromAnchor` and `toAnchor` overrides on individual edges. Support curve, straight and orthogonal route geometry without storing raw SVG paths in content configuration.
+
+**Reason:** Automatic intersections provide safe defaults, while explicit anchors preserve the visual meaning and cleanliness of authored layouts. Keeping route intent declarative leaves geometry under library control.
+
+**When changing this:** Retain the manual mode when adding presets, test all shape/route/anchor combinations, and visually verify shared junctions and unobscured arrowheads.

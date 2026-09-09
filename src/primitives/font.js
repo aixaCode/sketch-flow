@@ -8,6 +8,10 @@ export function fontFaceCss() {
   return embeddedFontFace;
 }
 
-export function renderFontDefinition() {
-  return `<style type="text/css">${embeddedFontFace}</style>`;
+export function renderFontDefinition({ id } = {}) {
+  if (id !== undefined && (typeof id !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]*$/.test(id))) {
+    throw new TypeError('font definition id must be a valid SVG identifier');
+  }
+  const idAttribute = id ? ` id="${id}"` : '';
+  return `<style${idAttribute} type="text/css">${embeddedFontFace}</style>`;
 }
