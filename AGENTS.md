@@ -10,30 +10,36 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 
 ## Repository map
 
-<!-- Describe the important directories, entry points, generated files, and ownership boundaries. -->
+- `src/index.js` — public package entry point.
+- `test/` — Node test suite.
+- `docs/AI_CONTEXT.md` — architecture and delivery context.
+- `docs/DECISIONS.md` — durable project decisions.
+- `dist/` — generated package output; never edit or commit it.
+- `.github/workflows/` — required CI, PR-title and SemVer-tag automation.
 
 ## Commands
 
-<!-- Provide exact, verified commands. Delete commands that do not apply. -->
-
 ```text
-install: <command>
-lint:    <command>
-test:    <command>
-build:   <command>
-run:     <command>
+install: npm ci
+lint:    npm run lint
+test:    npm test
+build:   npm run build
 ```
 
 Do not claim a check passed unless it was run successfully. If a command requires credentials, external services, or unsupported tooling, state that limitation.
 
 ## Project rules
 
-<!-- Add architecture rules, conventions, fragile areas, and files agents must not edit. -->
-
 - Follow nearby code and test patterns.
 - Keep changes focused; do not combine unrelated cleanup or dependency upgrades.
 - Add or update tests when behavior changes.
 - Update durable documentation when a change invalidates it.
+- Keep the package independent from `aixaCode/chart.xkcd`; depend only on the public npm package through an isolated compatibility entry point when that work is introduced.
+- Preserve attribution and applicable licence notices for any implementation or asset adapted from upstream projects.
+- Render diagrams as pure SVG. Do not introduce HTML `foreignObject` without recording and testing a justified exception.
+- Keep layout, geometry, rendering and export concerns in separate modules.
+- Keep output deterministic when a seed is provided so visual regression tests remain meaningful.
+- Do not enable npm publishing or remove `private: true` without explicit release authorization.
 - Start work from `development` on a typed working branch. Merge working PRs
   into `development` first. Before promotion, ensure `development` contains
   `main`, then promote the exact tested commit through a disposable
@@ -55,6 +61,5 @@ Do not claim a check passed unless it was run successfully. If a command require
 
 ## Repository-specific exceptions
 
-<!-- Record justified exceptions to REPO-STANDARDS.md, including default branch, versioning profile, deployment model, or release process. Write "None" when there are no exceptions. -->
-
-- None.
+- Versioning profile: SemVer. CI tags promoted commits on `main`; npm publishing is not yet configured.
+- Deployment: none. This is a library and the placeholder deployment workflow has been removed.
