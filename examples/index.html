@@ -12,6 +12,8 @@
       .grid { display: grid; gap: 24px; }
       figure { margin: 0; padding: 20px; border: 1px solid #ddd; background: #fff; }
       figcaption { margin-bottom: 12px; font-weight: 600; }
+      .actions { display: flex; gap: 8px; margin: 0 0 16px; }
+      button { padding: 8px 12px; border: 1px solid #111; border-radius: 6px; background: #fff; cursor: pointer; }
       svg { display: block; width: 100%; height: auto; }
       .diagram { aspect-ratio: 8 / 5; }
       .decision-diagram { aspect-ratio: 168 / 103; }
@@ -24,6 +26,10 @@
     <div class="grid">
       <figure>
         <figcaption>Approved pull-request fan-out composition</figcaption>
+        <div class="actions">
+          <button type="button" data-export="svg">Download SVG</button>
+          <button type="button" data-export="png">Download 2× PNG</button>
+        </div>
         <svg class="diagram"></svg>
       </figure>
       <figure>
