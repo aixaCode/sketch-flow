@@ -10,7 +10,11 @@ This is the vendor-neutral entry point for coding agents. Keep it concise and re
 
 ## Repository map
 
-- `src/index.js` — public package entry point.
+- `src/index.js` — public visual-primitives entry point.
+- `src/charts.js` — isolated chart.xkcd compatibility entry point.
+- `src/primitives/` — theme, font, filter and SVG shape primitives.
+- `examples/` — browser example for primitives and compatible charts.
+- `licenses/` — retained upstream licence notices.
 - `test/` — Node test suite.
 - `docs/AI_CONTEXT.md` — architecture and delivery context.
 - `docs/DECISIONS.md` — durable project decisions.
@@ -34,7 +38,7 @@ Do not claim a check passed unless it was run successfully. If a command require
 - Keep changes focused; do not combine unrelated cleanup or dependency upgrades.
 - Add or update tests when behavior changes.
 - Update durable documentation when a change invalidates it.
-- Keep the package independent from `aixaCode/chart.xkcd`; depend only on the public npm package through an isolated compatibility entry point when that work is introduced.
+- Keep the package independent from `aixaCode/chart.xkcd`; depend only on the exact tested public npm version through the isolated `./charts` compatibility entry point.
 - Preserve attribution and applicable licence notices for any implementation or asset adapted from upstream projects.
 - Render diagrams as pure SVG. Do not introduce HTML `foreignObject` without recording and testing a justified exception.
 - Keep layout, geometry, rendering and export concerns in separate modules.

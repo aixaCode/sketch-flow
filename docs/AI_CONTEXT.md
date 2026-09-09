@@ -6,13 +6,17 @@ This document is an onboarding map for engineers and coding agents. Keep it base
 
 Sketch Flow is a pre-alpha JavaScript library for hand-drawn SVG diagrams with flexible editorial layouts. The first target consumers are static article pages that need fan-out and decision-tree diagrams plus portable SVG and PNG exports.
 
-The repository is independent from `chart.xkcd`. A later compatibility entry point may expose the complete public API of an exact tested `chart.xkcd` npm version, but the diagram renderer must not depend on upstream internals.
+The repository is independent from `chart.xkcd`. The `./charts` compatibility entry point exposes the public API of the exact tested npm version `2.0.12`; the diagram primitives do not depend on upstream internals.
 
 ## Important locations
 
 | Path | Purpose |
 | --- | --- |
-| `src/index.js` | Public package entry point. |
+| `src/index.js` | Public visual-primitives entry point. |
+| `src/charts.js` | Isolated chart.xkcd compatibility entry point. |
+| `src/primitives/` | Theme, embedded font, roughness filter and SVG shape primitives. |
+| `examples/` | Browser example for visual and compatibility checks. |
+| `licenses/chart.xkcd-LICENSE` | Retained upstream MIT licence notice. |
 | `test/` | Node test suite. |
 | `vite.config.js` | ES-module library build. |
 | `ATTRIBUTION.md` | Upstream inspiration and licence attribution. |
@@ -21,7 +25,7 @@ The repository is independent from `chart.xkcd`. A later compatibility entry poi
 
 ## Runtime and data flow
 
-The current package exports only a pre-alpha status marker. Planned runtime flow:
+Phase 1 implements deterministic, composable visual primitives. The later diagram runtime will use them in this flow:
 
 ```text
 diagram configuration
@@ -34,7 +38,7 @@ diagram configuration
 
 ## External integrations
 
-There are no runtime services, credentials or data stores. `chart.xkcd` is an attributed visual reference and a possible future exact-version compatibility dependency.
+There are no runtime services, credentials or data stores. `chart.xkcd` `2.0.12` is an exact production dependency used only by `src/charts.js`; upgrades are deliberate compatibility changes, not floating updates.
 
 ## Tests and verification
 
@@ -42,7 +46,7 @@ There are no runtime services, credentials or data stores. `chart.xkcd` is an at
 - `npm test` runs the Node test suite.
 - `npm run build` produces the ES-module package under `dist/` with Vite.
 
-Browser rendering and visual-regression coverage are not implemented yet.
+The example page provides a manual browser rendering check. Automated browser and visual-regression coverage are not implemented yet.
 
 ## Delivery and operations
 
@@ -52,7 +56,6 @@ There is no deployment target. npm publishing is disabled and `package.json` is 
 
 ## Known gaps
 
-- Diagram API and module structure are not implemented.
+- Diagram composition, layout and connector routing are not implemented.
 - Browser and image-export test infrastructure is not selected.
-- The bundled font provenance and redistribution terms must be confirmed before embedding it.
 - The final public npm package name and publishing ownership require explicit approval.

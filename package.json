@@ -15,7 +15,8 @@
     "url": "https://github.com/aixaCode/sketch-flow/issues"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./charts": "./dist/charts.js"
   },
   "files": [
     "dist",
@@ -28,8 +29,12 @@
   },
   "scripts": {
     "build": "vite build",
+    "dev": "vite examples",
     "lint": "eslint .",
     "test": "node --test"
+  },
+  "dependencies": {
+    "chart.xkcd": "2.0.12"
   },
   "devDependencies": {
     "@eslint/js": "9.35.0",

@@ -54,3 +54,23 @@ exist after promotion.
 **Reason:** This prevents accidental publication under an incomplete or incorrect package identity.
 
 **When changing this:** Confirm the public API, package name, npm ownership, licence notices, provenance of embedded assets and release credentials.
+
+## 2026-09-09 — Isolate exact chart compatibility
+
+**Context:** Consumers should retain all public chart.xkcd chart constructors while Sketch Flow grows an independent diagram API.
+
+**Decision:** Pin `chart.xkcd` to exact version `2.0.12` and re-export it only from `@aixacode/sketch-flow/charts`. Keep the main primitives entry point independent from it.
+
+**Reason:** The isolated boundary preserves upstream functionality without coupling new diagram geometry or layout code to chart.xkcd internals. Exact pinning prevents silent upstream changes.
+
+**When changing this:** Upgrade deliberately, run the constructor compatibility test, inspect browser rendering and document any upstream breaking change.
+
+## 2026-09-09 — Share a portable hand-drawn visual foundation
+
+**Context:** Article diagrams need the same bold hand-drawn font and rough strokes as chart.xkcd, while supporting layouts that are not charts.
+
+**Decision:** Provide an embedded SVG font definition, deterministic roughness filter, immutable theme and reusable box, diamond and open-arrowhead primitives. The embedded font source is adapted from chart.xkcd and its MIT notice is retained under `licenses/`.
+
+**Reason:** A common primitive layer keeps diagrams and charts visually coherent. Open path arrowheads match the reference layout more closely than filled SVG markers and remain controllable as ordinary geometry.
+
+**When changing this:** Preserve deterministic seeded output and attribution, verify SVG portability, and visually compare strokes, font and arrowheads against the example.
