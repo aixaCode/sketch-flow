@@ -7,8 +7,11 @@ import {
   validateDiagramConfig,
 } from '../src/index.js';
 import { anchorPoint, boundaryPoint, edgeEndpoints } from '../src/diagram/geometry/bounds.js';
+import { layoutDiagram } from '../src/diagram/layout/index.js';
 import { routePath } from '../src/diagram/geometry/paths.js';
 import { wrapText } from '../src/diagram/render/text.js';
+import { resolveDiagramConfig } from '../src/diagram/schema.js';
+import { reviewGateDiagram, riskDecisionDiagram } from '../examples/diagrams.js';
 
 function baseConfig(overrides = {}) {
   return {
@@ -55,14 +58,118 @@ test('reports duplicate nodes, missing endpoints and invalid dimensions', () => 
     /width must be greater than zero/,
   );
   assert.throws(
-    () => validateDiagramConfig(baseConfig({ layout: { type: 'fan-out' } })),
-    /supports only layout.type "manual"/,
-  );
-  assert.throws(
     () => validateDiagramConfig(baseConfig({
       edges: [{ from: 'source', to: 'target', fromAnchor: 'center' }],
     })),
     /fromAnchor must be/,
+  );
+});
+
+test('requires coordinates only for manual layout', () => {
+  assert.throws(
+    () => validateDiagramConfig(baseConfig({ nodes: [{ id: 'one', label: 'ONE' }] })),
+    /nodes\[0\]\.x must be a finite number/,
+  );
+  const preset = validateDiagramConfig({
+    layout: { type: 'linear' },
+    nodes: [{ id: 'one', label: 'ONE' }],
+  });
+  assert.equal(preset.nodes[0].x, undefined);
+});
+
+test('lays out linear flows in both supported directions', () => {
+  const common = {
+    nodes: [
+      { id: 'second', label: 'SECOND', order: 2, width: 100, height: 60 },
+      { id: 'first', label: 'FIRST', order: 1, width: 100, height: 60 },
+    ],
+    edges: [{ from: 'first', to: 'second', route: 'orthogonal' }],
+    options: { width: 500, height: 400 },
+  };
+  const horizontal = layoutDiagram(validateDiagramConfig({
+    ...common,
+    layout: { type: 'linear', direction: 'left-to-right' },
+  }));
+  assert.deepEqual(horizontal.nodes.map((node) => node.id), ['first', 'second']);
+  assert.ok(horizontal.nodes[0].x < horizontal.nodes[1].x);
+  assert.equal(horizontal.edges[0].route, 'orthogonal');
+  assert.equal(horizontal.edges[0].fromAnchor, 'right');
+
+  const vertical = layoutDiagram(validateDiagramConfig({
+    ...common,
+    layout: { type: 'linear', direction: 'top-to-bottom' },
+  }));
+  assert.ok(vertical.nodes[0].y < vertical.nodes[1].y);
+  assert.equal(vertical.edges[0].fromAnchor, 'bottom');
+  assert.equal(vertical.edges[0].toAnchor, 'top');
+});
+
+test('lays out ordered fan-out destinations from a shared source', () => {
+  const laidOut = layoutDiagram(validateDiagramConfig(reviewGateDiagram));
+  const source = laidOut.nodes.find((node) => node.id === 'pull-request');
+  const destinations = laidOut.nodes.filter((node) => node.id !== 'pull-request');
+  assert.deepEqual(
+    destinations.map((node) => node.id),
+    ['mechanical', 'judgment', 'runtime', 'knowledge'],
+  );
+  assert.ok(destinations.every((node) => node.x > source.x));
+  assert.ok(destinations.every((node, index) => index === 0 || node.y > destinations[index - 1].y));
+  assert.ok(laidOut.edges.every((edge) => edge.fromAnchor === 'right' && edge.toAnchor === 'left'));
+});
+
+test('lays out upper, middle and lower decision-tree branches', () => {
+  const laidOut = layoutDiagram(validateDiagramConfig(riskDecisionDiagram));
+  const byId = new Map(laidOut.nodes.map((node) => [node.id, node]));
+  assert.ok(byId.get('change').x < byId.get('risk').x);
+  assert.ok(byId.get('risk').x < byId.get('low').x);
+  assert.ok(byId.get('low').y < byId.get('medium').y);
+  assert.ok(byId.get('medium').y < byId.get('high').y);
+  assert.equal(
+    laidOut.edges.find((edge) => edge.from === 'low').route,
+    'straight',
+  );
+});
+
+test('uses an explicit mobile diagram only at its breakpoint', () => {
+  const responsive = validateDiagramConfig({
+    layout: { type: 'linear' },
+    nodes: [{ id: 'desktop', label: 'DESKTOP' }],
+    mobile: {
+      breakpoint: 640,
+      layout: { type: 'linear', direction: 'top-to-bottom' },
+      nodes: [{ id: 'mobile', label: 'MOBILE' }],
+      options: { width: 400, height: 600 },
+    },
+  });
+  assert.equal(resolveDiagramConfig(responsive, 641).nodes[0].id, 'desktop');
+  assert.equal(resolveDiagramConfig(responsive, 640).nodes[0].id, 'mobile');
+  assert.throws(() => resolveDiagramConfig(responsive, 0), /greater than zero/);
+});
+
+test('approved preset examples do not contain manual coordinates', () => {
+  for (const example of [reviewGateDiagram, riskDecisionDiagram]) {
+    assert.notEqual(example.layout.type, 'manual');
+    assert.ok(example.nodes.every((node) => node.x === undefined && node.y === undefined));
+    assert.doesNotThrow(() => renderDiagram(example));
+  }
+});
+
+test('reports invalid preset topology and diagrams that cannot fit', () => {
+  assert.throws(
+    () => renderDiagram({
+      layout: { type: 'fan-out' },
+      nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }, { id: 'c', label: 'C' }],
+      edges: [{ from: 'a', to: 'b' }],
+    }),
+    /connected directly to every other node/,
+  );
+  assert.throws(
+    () => renderDiagram({
+      layout: { type: 'linear' },
+      nodes: [{ id: 'huge', label: 'HUGE', width: 1000, height: 1000 }],
+      options: { width: 200, height: 200 },
+    }),
+    /increase options\.width\/options\.height/,
   );
 });
 
