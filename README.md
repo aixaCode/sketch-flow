@@ -1,10 +1,39 @@
 # Sketch Flow
 
-Sketch Flow is a JavaScript library for hand-drawn SVG diagrams with flexible editorial layouts. It is designed for explanatory visuals such as fan-out diagrams, decision trees and risk-routing flows, with self-contained SVG and high-resolution PNG export planned for the first public release.
+Sketch Flow is a JavaScript library for hand-drawn SVG diagrams with flexible editorial layouts. It is designed for explanatory visuals such as fan-out diagrams, decision trees and risk-routing flows.
 
-The project is independent from [chart.xkcd](https://github.com/timqian/chart.xkcd). Sketch Flow takes inspiration from its visual language while owning a separate API, implementation and release lifecycle. See [ATTRIBUTION.md](ATTRIBUTION.md).
+The project is independent from [chart.xkcd](https://github.com/timqian/chart.xkcd). Sketch Flow owns its diagram API and release lifecycle while providing an isolated compatibility entry point for the complete public API of the exact, tested `chart.xkcd` version `2.0.12`. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-> **Status:** Pre-alpha repository bootstrap. The diagram API has not been released.
+> **Status:** Pre-alpha. Phase 1 provides the visual primitives; layout composition and SVG/PNG export arrive in later phases.
+
+## Phase 1 API
+
+The main entry point exports deterministic visual building blocks:
+
+- an embedded `xkcd` font definition for portable SVG;
+- a seeded roughness filter;
+- immutable theme defaults;
+- hand-drawn box and diamond shapes;
+- geometry and rendering for open arrowheads.
+
+```js
+import {
+  renderArrowhead,
+  renderBox,
+  renderFontDefinition,
+  renderRoughFilter,
+} from '@aixacode/sketch-flow';
+```
+
+Existing chart.xkcd functionality remains available through a separate entry point:
+
+```js
+import { charts } from '@aixacode/sketch-flow/charts';
+
+new charts.Bar(svgElement, chartConfiguration);
+```
+
+The exact upstream dependency is pinned so updates do not silently alter this API. A deliberate dependency upgrade still requires compatibility testing.
 
 ## Run
 
@@ -15,6 +44,12 @@ npm ci
 npm run lint
 npm test
 npm run build
+```
+
+Run the browser example with:
+
+```bash
+npm run dev
 ```
 
 ## Deploy

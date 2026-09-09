@@ -1,5 +1,9 @@
-/**
- * Sketch Flow is in repository-bootstrap phase.
- * The public diagram API will be introduced in the first feature release.
- */
-export const projectStatus = 'pre-alpha';
+export { createRoughFilter, renderRoughFilter } from './primitives/filter.js';
+export { fontFaceCss, renderFontDefinition } from './primitives/font.js';
+export { createTheme, defaultTheme } from './primitives/theme.js';
+export {
+  arrowheadPoints,
+  renderArrowhead,
+  renderBox,
+  renderDiamond,
+} from './primitives/shapes.js';
