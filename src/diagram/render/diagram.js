@@ -79,14 +79,20 @@ function renderEdge(edge, nodeById, config, filterId) {
     fromAnchor: edge.fromAnchor,
     toAnchor: edge.toAnchor,
   });
-  const routed = routePath(start, end, edge.route);
+  const routed = routePath(start, end, edge.route, {
+    fromAnchor: edge.fromAnchor,
+    toAnchor: edge.toAnchor,
+  });
   const stroke = colorFor(edge.accent, config.theme);
   const common = `fill="none" stroke="${escapeXml(stroke)}" stroke-width="${config.theme.strokeWidth}" stroke-linecap="round" stroke-linejoin="round"`;
   const path = `<path d="${routed.d}" ${common}/>`;
   const arrowhead = renderArrowhead({
     from: routed.arrowFrom,
     tip: end,
-    size: config.options.arrowSize,
+    size: Math.max(
+      8,
+      Math.min(config.options.arrowSize, Math.hypot(end.x - start.x, end.y - start.y) * 0.45),
+    ),
     stroke,
     strokeWidth: config.theme.strokeWidth,
   });
@@ -100,6 +106,7 @@ export function renderDiagramMarkup(config, diagramId, {
   const { nodes, edges: laidOutEdges } = layoutDiagram(config);
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
   const filterId = `${diagramId}-rough`;
+  const edgeFilterId = `${diagramId}-edge-rough`;
   const titleId = `${diagramId}-title`;
   const descriptionId = `${diagramId}-description`;
   const fontStyleId = `${diagramId}-font`;
@@ -107,6 +114,10 @@ export function renderDiagramMarkup(config, diagramId, {
   const definitions = `<defs>${fontDefinition}${renderRoughFilter({
     id: filterId,
     roughness: config.theme.roughness,
+    seed: config.theme.seed,
+  })}${renderRoughFilter({
+    id: edgeFilterId,
+    roughness: config.theme.roughness * 0.35,
     seed: config.theme.seed,
   })}</defs>`;
   const accessibleTitle = `<title id="${titleId}">${escapeXml(config.ariaLabel)}</title>`;
@@ -130,7 +141,7 @@ export function renderDiagramMarkup(config, diagramId, {
       className: 'sketch-flow-title',
     })
     : '';
-  const edges = laidOutEdges.map((edge) => renderEdge(edge, nodeById, config, filterId)).join('');
+  const edges = laidOutEdges.map((edge) => renderEdge(edge, nodeById, config, edgeFilterId)).join('');
   const renderedNodes = nodes.map((node) => renderNode(node, config, filterId)).join('');
   return `${definitions}${accessibleTitle}${accessibleDescription}${background}${visualTitle}<g class="sketch-flow-edges">${edges}</g><g class="sketch-flow-nodes">${renderedNodes}</g>`;
 }

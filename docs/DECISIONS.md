@@ -124,3 +124,21 @@ exist after promotion.
 **Reason:** Browser screenshots cover the visual contract that matters to article production while deterministic inputs keep failures actionable. Moderate pixel tolerance absorbs platform antialiasing without accepting structural layout changes.
 
 **When changing this:** Review baseline images rather than updating them blindly, keep every supported constructor in the gallery, and test changes with the same pinned browser version used by CI.
+
+## 2026-09-10 — Keep connector tangents aligned with node anchors
+
+**Context:** Curves selected their approach direction from the largest coordinate
+delta. A fan-out target positioned mostly above its source could therefore receive
+an upward-pointing arrow even though the connector entered its left edge. Short
+mobile gaps also left full-size arrowheads competing with adjacent boxes.
+
+**Decision:** Derive curved-path tangents from explicit source and destination
+anchors, cap arrowhead size against the available connector span, narrow the
+arrowhead wings, and apply a lighter roughness filter to connectors than nodes.
+
+**Reason:** Anchor-aligned curves communicate direction cleanly. Proportional
+arrowheads remain legible in compact layouts, while lighter displacement preserves
+the hand-drawn character without making arrow geometry look broken.
+
+**When changing this:** Test mixed and matching anchor directions, compact mobile
+gaps and fan-out layouts. Review browser baselines at every supported viewport.
