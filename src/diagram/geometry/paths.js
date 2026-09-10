@@ -6,7 +6,10 @@ function point(value) {
   return `${number(value.x)} ${number(value.y)}`;
 }
 
-export function routePath(start, end, route = 'curve') {
+export function routePath(start, end, route = 'curve', {
+  fromAnchor = 'auto',
+  toAnchor = 'auto',
+} = {}) {
   if (!['curve', 'straight', 'orthogonal'].includes(route)) {
     throw new TypeError(`unknown edge route "${route}"`);
   }
@@ -38,18 +41,35 @@ export function routePath(start, end, route = 'curve') {
     };
   }
 
-  if (horizontal) {
-    const controlOffset = deltaX * 0.55;
-    const firstControl = { x: start.x + controlOffset, y: start.y };
-    const secondControl = { x: end.x - controlOffset, y: end.y };
-    return {
-      d: `M ${point(start)} C ${point(firstControl)} ${point(secondControl)} ${point(end)}`,
-      arrowFrom: secondControl,
+  const defaultDirection = horizontal
+    ? { x: Math.sign(deltaX) || 1, y: 0 }
+    : { x: 0, y: Math.sign(deltaY) || 1 };
+  const anchorDirection = (anchor, inbound = false) => {
+    const directions = {
+      top: { x: 0, y: inbound ? 1 : -1 },
+      right: { x: inbound ? -1 : 1, y: 0 },
+      bottom: { x: 0, y: inbound ? -1 : 1 },
+      left: { x: inbound ? 1 : -1, y: 0 },
     };
-  }
-  const controlOffset = deltaY * 0.55;
-  const firstControl = { x: start.x, y: start.y + controlOffset };
-  const secondControl = { x: end.x, y: end.y - controlOffset };
+    return directions[anchor] ?? defaultDirection;
+  };
+  const startDirection = anchorDirection(fromAnchor);
+  const endDirection = anchorDirection(toAnchor, true);
+  const directLength = Math.hypot(deltaX, deltaY);
+  const minimumHandle = Math.min(40, directLength * 0.25);
+  const handleLength = (direction) => direction.x === 0
+    ? Math.max(minimumHandle, Math.abs(deltaY) * 0.55)
+    : Math.max(minimumHandle, Math.abs(deltaX) * 0.55);
+  const firstHandle = handleLength(startDirection);
+  const secondHandle = handleLength(endDirection);
+  const firstControl = {
+    x: number(start.x + startDirection.x * firstHandle),
+    y: number(start.y + startDirection.y * firstHandle),
+  };
+  const secondControl = {
+    x: number(end.x - endDirection.x * secondHandle),
+    y: number(end.y - endDirection.y * secondHandle),
+  };
   return {
     d: `M ${point(start)} C ${point(firstControl)} ${point(secondControl)} ${point(end)}`,
     arrowFrom: secondControl,

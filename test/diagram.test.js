@@ -200,6 +200,20 @@ test('creates straight, curved and orthogonal routes with arrow directions', () 
   const end = { x: 100, y: 80 };
   assert.equal(routePath(start, end, 'straight').d, 'M 0 20 L 100 80');
   assert.equal(routePath(start, end, 'curve').d, 'M 0 20 C 55 20 45 80 100 80');
+  assert.deepEqual(
+    routePath(start, end, 'curve', { fromAnchor: 'right', toAnchor: 'left' }),
+    {
+      d: 'M 0 20 C 55 20 45 80 100 80',
+      arrowFrom: { x: 45, y: 80 },
+    },
+  );
+  assert.deepEqual(
+    routePath(start, end, 'curve', { fromAnchor: 'right', toAnchor: 'top' }),
+    {
+      d: 'M 0 20 C 55 20 100 47 100 80',
+      arrowFrom: { x: 100, y: 47 },
+    },
+  );
   assert.deepEqual(routePath(start, end, 'orthogonal'), {
     d: 'M 0 20 L 50 20 L 50 80 L 100 80',
     arrowFrom: { x: 50, y: 80 },
@@ -220,6 +234,7 @@ test('renders portable manual diagram markup with visible open arrows', () => {
   }), { id: 'review-flow' });
   assert.match(markup, /id="review-flow-font"/);
   assert.match(markup, /id="review-flow-rough"/);
+  assert.match(markup, /id="review-flow-edge-rough"/);
   assert.match(markup, /data-edge="source:target"/);
   assert.match(markup, /class="sketch-flow-description"/);
   assert.doesNotMatch(markup, /<marker/);

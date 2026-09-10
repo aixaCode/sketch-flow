@@ -73,7 +73,7 @@ test('renders open arrowheads instead of filled SVG markers', () => {
     stroke: '#1464e8',
     fill: '#1464e8',
   });
-  assert.match(arrowhead, /d="M 10 5.5 L 20 0 L 10 -5.5"/);
+  assert.match(arrowhead, /d="M 10 4.2 L 20 0 L 10 -4.2"/);
   assert.match(arrowhead, /fill="none"/);
 });
 

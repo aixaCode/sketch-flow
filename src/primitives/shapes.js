@@ -47,7 +47,7 @@ export function renderDiamond({ x, y, width, height, ...options }) {
   return `<polygon points="${points}" ${strokeAttributes(options)}/>`;
 }
 
-export function arrowheadPoints({ from, tip, size = 15, wingRatio = 0.55 }) {
+export function arrowheadPoints({ from, tip, size = 15, wingRatio = 0.42 }) {
   finiteNumber(from?.x, 'from.x');
   finiteNumber(from?.y, 'from.y');
   finiteNumber(tip?.x, 'tip.x');
